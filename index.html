@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+	<head>
+		<title>JapBank</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no">
+		<style>
+			body {
+				text-align: center;
+				font-family: sans-serif;
+			}
+			#console {
+				background: #111;
+				padding: 10px;
+				width: 90%;
+				max-width: 616px;
+				margin-right: auto;
+				margin-left: auto;
+				border-radius: 6px;
+				margin-top: 10px;
+				color: #fff;
+				font-family: monospace;
+				height: 308px;
+				overflow: auto;
+			}
+			.password {
+				position: fixed;
+				background: #fff;
+				width: 100%;
+				height: 100vh;
+			}
+		</style>
+		<script>
+		  // Initialize Firebase
+		  var config = {
+		    apiKey: "AIzaSyBZMTSJCQIkabozaCGGnNI3aAb9MS3f7PA",
+		    authDomain: "jappyup-60483.firebaseapp.com",
+		    databaseURL: "https://jappyup-60483.firebaseio.com",
+		    projectId: "jappyup-60483",
+		    storageBucket: "",
+		    messagingSenderId: "780362673356"
+		  };
+		  firebase.initializeApp(config);
+		</script>
+		<script src='https://cdn.firebase.com/js/client/2.4.0/firebase.js'></script>
+	</head>
+	<body>
+		<div class="password" id="passport">
+			<input type="password" placeholder="パスワードを入力" id="passdo"><br>
+			<button onclick="conpass()">決定</button>
+		</div>
+		<span>データの種類を選択</span>
+		<select id="modeBank" onchange="switchMode()">
+			<option value="voc">Vocabulary</option>
+			<option value="gra" disabled>Grammer</option>
+			<option value="lij" disabled>Learning in Japanese</option>
+			<option value="wij" disabled>Writing</option>
+		</select>
+		<form id="vocForm" action="javascript:send()">
+			<input id="lvVoc" type="number tel" placeholder="レベルを入力（数字）"><br>
+			<input id="jpVoc" placeholder="日本語の単語を入力"><br>
+			<input id="enVoc" placeholder="英語訳を入力"><br>
+			<input type="submit" value="データを送信">
+		</form>
+		<div id="console"><span id="alerttxt">no data to load</span></div>
+		<script>
+			var myFirebase = new Firebase('https://jappyup-60483.firebaseio.com');
+			function send() {
+				var lvTXT = document.getElementById("lvVoc").value;
+				var enTXT = document.getElementById("enVoc").value;
+				var jpTXT = document.getElementById("jpVoc").value;
+				myFirebase.push({level:lvTXT, enVoc:enTXT, jpVoc:jpTXT});
+			}
+			var startListening = function() {
+				myFirebase.on('child_added', function(snapshot) {
+					document.getElementById("alerttxt").innerHTML = "";
+					var msg = snapshot.val();
+					document.getElementById("console").innerHTML += "data: <strong style='color: #00bcd4'>Level</strong> <span style='color: #ffc107;'>" + msg.level + "</span>, <strong style='color: #00bcd4'>Japanese Vocab</strong> <span style='color: #ffc107;'>" + msg.jpVoc + "</span>, <strong style='color: #00bcd4'>English Meaning</strong> <span style='color: #ffc107;'>" + msg.enVoc + "</span><br><br>";
+					document.getElementById("console").scrollTo(0,document.body.scrollHeight);
+				});
+			}
+			function conpass() {
+				var psd = document.getElementById("passdo").value;
+				if(psd == "coolJapan") {
+					document.getElementById("passport").style.display = "none";
+				}
+			}
+			startListening();
+		</script>
+	</body>
+</html>
